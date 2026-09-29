@@ -92,7 +92,8 @@ where $\text{KRD}_k = \partial V / \partial z_k$ are key-rate durations (bump on
 pillar's zero rate, hold the rest). The pillar move $\Delta z$ is projected onto
 orthogonal level / slope / curvature shapes, so the buckets are additive by
 construction and the residual isolates convexity plus off-shape moves. The test
-suite asserts the sum reconciles to full revaluation at ~1e-10.
+suite asserts the buckets sum to the full-revaluation P&L within 1e-6 on a
+two-swap book of 30M notional (and that a par swap reprices to zero within 1e-9).
 
 ## References
 
