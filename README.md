@@ -1,6 +1,6 @@
 # SOFR Swap Valuation & P&L Attribution
 
-Bootstrap a SOFR curve, mark a book of vanilla interest-rate swaps, and decompose
+Bootstrap a discount curve, mark a book of vanilla interest-rate swaps, and decompose
 the daily P&L into the buckets a rates desk actually reports — **carry, roll-down,
 and curve moves (level / slope / curvature)** — with the parts summing exactly to
 the total.
@@ -9,7 +9,9 @@ the total.
 
 ## What it does
 
-1. **Bootstrap** a single SOFR discount curve from par swap rates (`curve.py`).
+1. **Bootstrap** a single discount curve from par rates (`curve.py`). The pricer is
+   built for a SOFR swap curve; it is run on Treasury constant-maturity par yields,
+   because those are free and SOFR swap rates are not (see *Notes*).
 2. **Price** fixed-vs-SOFR swaps off that curve — NPV, par rate, DV01 (`pricing.py`).
 3. **Attribute** the change in mark-to-market between two days into carry,
    roll-down, and the curve move, split by shape (`attribution.py`).
@@ -28,7 +30,7 @@ dealer publishes its positions; the market data is not.
 | Slope | −62,753 | steepening/flattening |
 | Curvature | −4,558 | belly vs. wings |
 | Residual | −2,176 | convexity + off-shape moves |
-| **Total** | **−237,106** | reconciles to full revaluation (check = 0.00e+00) |
+| **Total** | **−237,106** | reconciles to full revaluation (parts − total < 1e-10) |
 
 The residual is 0.9% of the total on a small move. Ask for the largest one-day move in
 the ten-year that the sample contains and it becomes 9%:
@@ -53,8 +55,9 @@ log-linearly (piecewise-flat forwards). Every input par swap reprices to zero �
 test suite asserts it.
 
 **Pricing.** A payer swap is valued by the bond-minus-floater identity,
-`NPV = N·[(1 − DF(T)) − K·Σ τ_i DF(t_i)]`, with the float leg taken at par on the
-reset (exact on reset dates; a small, consistent approximation between them).
+`NPV = N·[(DF(start) − DF(T)) − K·Σ τ_i DF(t_i)]`, which is `1 − DF(T)` on the float leg
+for a swap that has already started, with the float leg taken at par on the reset
+(exact on reset dates; a small, consistent approximation between them).
 
 **Attribution.** The total is built to be *exactly additive*:
 
@@ -234,9 +237,9 @@ uv run pytest                                        # 18 checks
 
 ## Notes & assumptions
 
-- **Single curve.** SOFR projects and discounts — standard for a collateralised USD
-  book; a dual-curve (OIS-discounted, separate projection) setup would slot into the
-  same pricer.
+- **Single curve.** One curve projects and discounts, which is the standard set-up for a
+  collateralised USD book on SOFR; a dual-curve (OIS-discounted, separate projection)
+  set-up would slot into the same pricer.
 - **Treasury, not swap, curve.** The discount curve is bootstrapped from Treasury CMT
   par yields. A collateralised SOFR book discounts on the SOFR curve, which sits a swap
   spread away. ICE Swap Rate is licensed and FRED's public endpoint caps ICE BofA series
