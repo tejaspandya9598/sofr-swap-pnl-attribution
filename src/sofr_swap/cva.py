@@ -93,7 +93,7 @@ def curve_factors(changes: np.ndarray, n_factors: int = 3):
 
     Three principal components of the real daily changes fix it, because every
     simulated move is then a combination of shapes the Treasury curve actually makes.
-    On this sample they are the textbook three and they carry 98% of the variance.
+    On this sample they are the textbook three, and they carry 98% of the variance.
     """
     u, sv, vt = np.linalg.svd(changes - changes.mean(axis=0), full_matrices=False)
     explained = sv ** 2 / (sv ** 2).sum()
@@ -113,7 +113,7 @@ def simulate(panel: pd.DataFrame, horizon: float, steps: int, n_paths: int,
     that are far too tame in the tail.
 
     `decouple` resamples the spread from different days than the curve. Each marginal
-    distribution is untouched and their joint behaviour is destroyed, which is the
+    distribution is untouched, and their joint behaviour is destroyed, which is the
     counterfactual that isolates wrong-way risk.
 
     Two constraints keep the simulated curves inside shapes the market has printed,

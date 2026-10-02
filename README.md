@@ -33,7 +33,7 @@ dealer publishes its positions; the market data is not.
 | **Total** | **−237,106** | reconciles to full revaluation (parts − total < 1e-10) |
 
 The residual is 0.9% of the total on a small move. Ask for the largest one-day move in
-the ten-year that the sample contains and it becomes 9%:
+the ten-year that the sample contains, and it becomes 9%:
 
 ```
 uv run python scripts/run_attribution.py --worst-day
